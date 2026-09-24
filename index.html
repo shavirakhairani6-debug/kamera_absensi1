@@ -1,22 +1,26 @@
 <!DOCTYPE html>
+
 <html>
 
 <head>
 
   <meta charset="UTF-8">
 
+
   <meta
     name="viewport"
     content="width=device-width,
-    initial-scale=1.0,
-    maximum-scale=1.0">
+             initial-scale=1,
+             maximum-scale=1">
 
-  <title>ABSIS Camera</title>
+
+  <title>
+    ABSIS Camera
+  </title>
 
 
   <!--
-    HTML5 QR CODE
-    Digunakan untuk membaca QR melalui kamera.
+    LIBRARY SCANNER QR
   -->
 
   <script
@@ -28,15 +32,22 @@
   <style>
 
     * {
-      box-sizing: border-box;
+      box-sizing:
+        border-box;
     }
 
 
     body {
 
-      margin: 0;
+      margin:
+        0;
 
-      min-height: 100vh;
+      min-height:
+        100vh;
+
+      font-family:
+        Arial,
+        sans-serif;
 
       background:
         linear-gradient(
@@ -45,32 +56,37 @@
           #eef5ff
         );
 
-      font-family:
-        Arial,
-        sans-serif;
+      display:
+        flex;
 
-      display: flex;
+      align-items:
+        center;
 
-      align-items: center;
+      justify-content:
+        center;
 
-      justify-content: center;
-
-      padding: 12px;
+      padding:
+        12px;
 
     }
 
 
-    .camera-card {
+    .card {
 
-      width: 100%;
+      width:
+        100%;
 
-      max-width: 550px;
+      max-width:
+        560px;
 
-      background: white;
+      background:
+        white;
 
-      border-radius: 28px;
+      border-radius:
+        28px;
 
-      padding: 15px;
+      padding:
+        16px;
 
       box-shadow:
         0 10px 35px
@@ -81,9 +97,11 @@
 
     .title {
 
-      text-align: center;
+      text-align:
+        center;
 
-      padding: 8px;
+      margin-bottom:
+        14px;
 
     }
 
@@ -94,51 +112,64 @@
         0 0 5px;
 
       color:
-        #635669;
+        #5e5265;
 
     }
 
 
     .title p {
 
-      margin: 0;
+      margin:
+        0;
 
       color:
-        #9a8e9e;
+        #999;
 
-      font-size: 12px;
+      font-size:
+        12px;
 
     }
 
 
     #reader {
 
-      width: 100%;
+      width:
+        100%;
 
-      overflow: hidden;
+      overflow:
+        hidden;
 
-      border-radius: 22px;
+      border-radius:
+        22px;
+
+      background:
+        #111;
 
     }
 
 
     .status {
 
-      margin-top: 12px;
+      margin-top:
+        12px;
 
-      padding: 12px;
+      padding:
+        13px;
 
       background:
         #faf7fb;
 
-      border-radius: 16px;
+      border-radius:
+        16px;
 
-      text-align: center;
+      text-align:
+        center;
 
       color:
         #786d7d;
 
-      font-size: 13px;
+      font-size:
+        13px;
 
     }
 
@@ -157,7 +188,7 @@
     .error {
 
       color:
-        #b94d62;
+        #bd5264;
 
       font-weight:
         bold;
@@ -165,16 +196,34 @@
     }
 
 
-    .footer {
+    .back {
 
-      text-align: center;
+      display:
+        block;
+
+      width:
+        100%;
+
+      margin-top:
+        10px;
+
+      padding:
+        12px;
+
+      border:
+        0;
+
+      border-radius:
+        15px;
+
+      background:
+        #ff9ec8;
 
       color:
-        #aaa;
+        white;
 
-      font-size: 10px;
-
-      padding-top: 10px;
+      font-weight:
+        bold;
 
     }
 
@@ -186,328 +235,481 @@
 <body>
 
 
-  <div class="camera-card">
+<div class="card">
 
 
-    <div class="title">
+  <div class="title">
 
-      <h2>
-        📷 Scan QR ABSIS
-      </h2>
+    <h2>
+      🐰 ABSIS
+    </h2>
 
-      <p>
-        Arahkan kamera ke QR siswa
-      </p>
-
-    </div>
-
-
-    <div id="reader"></div>
-
-
-    <div
-      id="status"
-      class="status">
-
-      ⏳ Menyiapkan kamera...
-
-    </div>
-
-
-    <div class="footer">
-
-      ABSIS • Absensi Siswa
-
-    </div>
-
+    <p>
+      Scanner QR Absensi Siswa
+    </p>
 
   </div>
 
 
-  <script>
+  <div id="reader"></div>
+
+
+  <div
+    id="status"
+    class="status">
+
+    ⏳ Menyiapkan kamera...
+
+  </div>
+
+
+  <button
+    class="back"
+    onclick="goBack()">
+
+    ← Kembali ke ABSIS
+
+  </button>
+
+
+</div>
+
+
+<script>
+
+
+/* =================================================
+   CAMERA SCANNER
+   ================================================= */
+
+
+let scanner =
+  null;
+
+
+let lastCode =
+  '';
+
+
+let lastTime =
+  0;
+
+
+/* =================================================
+   STATUS
+   ================================================= */
+
+function setStatus(
+  text,
+  type
+) {
+
+  const box =
+    document.getElementById(
+      'status'
+    );
+
+
+  box.innerHTML =
+    text;
+
+
+  box.className =
+    'status ' +
+    (
+      type || ''
+    );
+
+}
+
+
+/* =================================================
+   SUCCESS
+   ================================================= */
+
+function onScanSuccess(
+  decodedText,
+  decodedResult
+) {
+
+  const code =
+    String(
+      decodedText || ''
+    ).trim();
+
+
+  if (!code) {
+    return;
+  }
+
+
+  const now =
+    Date.now();
+
+
+  /*
+   * Jangan kirim QR yang sama
+   * berkali-kali.
+   */
+
+  if (
+    code === lastCode &&
+    now - lastTime < 5000
+  ) {
+
+    return;
+
+  }
+
+
+  lastCode =
+    code;
+
+
+  lastTime =
+    now;
+
+
+  /*
+   * Cek format QR ABSIS
+   */
+
+  if (
+    !code.startsWith(
+      'ABSIS|'
+    )
+  ) {
+
+    setStatus(
+      '❌ Ini bukan QR ABSIS.',
+      'error'
+    );
+
+
+    return;
+
+  }
+
+
+  setStatus(
+    '💗 QR terbaca! Mengirim ke ABSIS...',
+    ''
+  );
+
+
+  /*
+   * =============================================
+   * KIRIM KE WINDOW ABSIS
+   * =============================================
+   *
+   * Ketika scanner dibuka dari ABSIS,
+   * window.opener adalah halaman ABSIS.
+   */
+
+  if (
+    window.opener &&
+    !window.opener.closed
+  ) {
+
+
+    window.opener.postMessage(
+
+      {
+
+        type:
+          'ABSIS_QR_SCAN',
+
+        qrCode:
+          code
+
+      },
+
+      '*'
+
+    );
+
+
+    setStatus(
+      '🎉 QR berhasil dikirim ke ABSIS.<br>' +
+      'Silakan lihat halaman ABSIS.',
+      'success'
+    );
+
+
+  } else {
 
 
     /*
-     * ===========================================
-     * KONFIGURASI CAMERA
-     * ===========================================
-     *
-     * QR scanner menggunakan halaman GitHub Pages.
-     *
-     * Kamera tidak mengirim data ke GitHub.
-     * Setelah QR terbaca, hasil dikirim ke
-     * halaman ABSIS menggunakan postMessage.
-     *
+     * Jika scanner dibuka langsung,
+     * tampilkan QR saja.
      */
 
+    setStatus(
 
-    const SCANNER_NAME =
-      'ABSIS_CAMERA';
+      '💗 QR terbaca:<br><br>' +
 
+      '<b>' +
+      escapeHtml(
+        code
+      ) +
+      '</b><br><br>' +
 
-    let scanner = null;
+      'Buka scanner melalui tombol ' +
+      '📷 Buka Kamera di ABSIS.',
 
+      'success'
 
-    let lastScannedCode = '';
+    );
 
-
-    let lastScanTime = 0;
-
-
-    /* ===========================================
-       STATUS
-       =========================================== */
-
-    function setStatus(
-      message,
-      type
-    ) {
-
-      const box =
-        document.getElementById(
-          'status'
-        );
+  }
 
 
-      box.innerHTML =
-        message;
+  /*
+   * Reset agar QR berikutnya
+   * dapat dipindai.
+   */
+
+  setTimeout(
+    function() {
+
+      lastCode =
+        '';
+
+    },
+    5000
+  );
+
+}
 
 
-      box.className =
-        'status ' +
-        (type || '');
+/* =================================================
+   FAILURE
+   ================================================= */
 
-    }
+function onScanFailure(
+  errorMessage
+) {
 
+  /*
+   * Jangan menampilkan setiap error
+   * karena scanner memanggil fungsi ini
+   * berkali-kali saat mencari QR.
+   */
 
-    /* ===========================================
-       SCAN SUCCESS
-       =========================================== */
-
-    function onScanSuccess(
-      decodedText,
-      decodedResult
-    ) {
-
-      const code =
-        String(
-          decodedText || ''
-        ).trim();
+}
 
 
-      if (!code) {
-        return;
-      }
+/* =================================================
+   START CAMERA
+   ================================================= */
+
+function startCamera() {
+
+  if (
+    typeof Html5Qrcode ===
+    'undefined'
+  ) {
+
+    setStatus(
+      '❌ Library scanner tidak berhasil dimuat.',
+      'error'
+    );
 
 
-      /*
-       * Mencegah satu QR terkirim
-       * berkali-kali dalam waktu singkat.
-       */
+    return;
 
-      const now =
-        Date.now();
+  }
 
 
-      if (
-        code === lastScannedCode &&
-        now - lastScanTime < 5000
+  scanner =
+    new Html5Qrcode(
+      'reader'
+    );
+
+
+  const config = {
+
+    fps:
+      10,
+
+    qrbox:
+      function(
+        width,
+        height
       ) {
 
-        return;
-
-      }
-
-
-      lastScannedCode =
-        code;
-
-
-      lastScanTime =
-        now;
-
-
-      setStatus(
-        '💗 QR terbaca! Mengirim ke ABSIS...',
-        ''
-      );
-
-
-      /*
-       * Kirim ke halaman Apps Script
-       * yang sedang menampilkan iframe ini.
-       */
-
-      window.parent.postMessage(
-        {
-          type:
-            'ABSIS_QR_SCAN',
-
-          qrCode:
-            code,
-
-          scanner:
-            SCANNER_NAME
-        },
-        '*'
-      );
-
-
-      /*
-       * Beri jeda sebelum QR yang sama
-       * boleh diproses kembali.
-       */
-
-      setTimeout(function() {
-
-        setStatus(
-          '📷 Silakan scan QR berikutnya...',
-          ''
-        );
-
-      }, 1800);
-
-    }
-
-
-    /* ===========================================
-       SCAN ERROR
-       =========================================== */
-
-    function onScanFailure(
-      errorMessage
-    ) {
-
-      /*
-       * Jangan menampilkan error
-       * setiap frame karena akan terlalu ramai.
-       */
-
-    }
-
-
-    /* ===========================================
-       START CAMERA
-       =========================================== */
-
-    function startCamera() {
-
-      scanner =
-        new Html5Qrcode(
-          'reader'
-        );
-
-
-      const config = {
-
-        fps: 10,
-
-        qrbox: function(
-          viewfinderWidth,
-          viewfinderHeight
-        ) {
-
-          const size =
+        const size =
+          Math.floor(
             Math.min(
-              viewfinderWidth,
-              viewfinderHeight
-            ) * 0.68;
-
-
-          return {
-            width: size,
-            height: size
-          };
-
-        },
-
-        aspectRatio:
-          1.0
-
-      };
-
-
-      /*
-       * Kamera belakang diprioritaskan.
-       */
-
-      scanner
-        .start(
-          {
-            facingMode:
-              {
-                ideal:
-                  'environment'
-              }
-          },
-
-          config,
-
-          onScanSuccess,
-
-          onScanFailure
-
-        )
-
-        .then(function() {
-
-          setStatus(
-            '💚 Kamera aktif. Arahkan QR ke kotak scan.',
-            'success'
-          );
-
-        })
-
-        .catch(function(error) {
-
-          console.error(
-            error
+              width,
+              height
+            ) * .70
           );
 
 
-          setStatus(
-            '❌ Kamera tidak dapat dibuka.<br>' +
-            '<small>' +
-            'Pastikan izin kamera diberikan dan halaman dibuka melalui HTTPS.' +
-            '</small>',
-            'error'
-          );
+        return {
 
-        });
+          width:
+            size,
 
-    }
+          height:
+            size
+
+        };
+
+      },
+
+    aspectRatio:
+      1.0
+
+  };
 
 
-    /* ===========================================
-       LOAD
-       =========================================== */
+  /*
+   * =============================================
+   * PRIORITAS KAMERA BELAKANG
+   * =============================================
+   */
 
-    window.addEventListener(
-      'load',
+  scanner
+    .start(
+
+      {
+        facingMode:
+          'environment'
+      },
+
+      config,
+
+      onScanSuccess,
+
+      onScanFailure
+
+    )
+
+    .then(
       function() {
 
-        if (
-          typeof Html5Qrcode ===
-          'undefined'
-        ) {
+        setStatus(
+          '💚 Kamera aktif.<br>' +
+          'Arahkan QR siswa ke kotak scan.',
+          'success'
+        );
 
-          setStatus(
-            '❌ Library QR tidak berhasil dimuat.',
-            'error'
-          );
+      }
+    )
 
-          return;
+    .catch(
+      function(error) {
 
-        }
+        console.error(
+          error
+        );
 
 
-        startCamera();
+        setStatus(
+
+          '❌ Kamera tidak dapat dibuka.<br><br>' +
+
+          '<small>' +
+
+          'Pastikan:<br>' +
+
+          '1. Website dibuka melalui HTTPS.<br>' +
+
+          '2. Izin kamera diberikan.<br>' +
+
+          '3. Browser tidak memblokir kamera.' +
+
+          '</small>',
+
+          'error'
+
+        );
 
       }
     );
 
+}
 
-  </script>
+
+/* =================================================
+   BACK
+   ================================================= */
+
+function goBack() {
+
+  if (
+    window.opener &&
+    !window.opener.closed
+  ) {
+
+    window.close();
+
+  } else {
+
+    history.back();
+
+  }
+
+}
+
+
+/* =================================================
+   ESCAPE
+   ================================================= */
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value ?? ''
+  )
+
+    .replace(
+      /&/g,
+      '&amp;'
+    )
+
+    .replace(
+      /</g,
+      '&lt;'
+    )
+
+    .replace(
+      />/g,
+      '&gt;'
+    )
+
+    .replace(
+      /"/g,
+      '&quot;'
+    )
+
+    .replace(
+      /'/g,
+      '&#039;'
+    );
+
+}
+
+
+/* =================================================
+   START
+   ================================================= */
+
+window.addEventListener(
+  'load',
+  function() {
+
+    startCamera();
+
+  }
+);
+
+
+</script>
 
 
 </body>
