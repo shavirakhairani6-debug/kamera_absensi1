@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1"
+  >
+
+  <title>Kamera Absensi QR</title>
+
+  <!-- QR SCANNER - TETAP MENGGUNAKAN LIBRARY LAMA -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --pink: #d96b9c;
+      --pink-dark: #b94f80;
+      --pink-soft: #fde8f1;
+      --pink-light: #fff5f9;
+      --cream: #fffaf5;
+      --text: #4b3440;
+      --muted: #8b707c;
+      --white: #ffffff;
+      --border: #f0d5e1;
+      --green: #4e9b78;
+      --red: #c84e65;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+    }
+
+    body {
+      background:
+        radial-gradient(
+          circle at top left,
+          #ffeaf3 0,
+          transparent 32%
+        ),
+        radial-gradient(
+          circle at top right,
+          #fff0d9 0,
+          transparent 30%
+        ),
+        linear-gradient(
+          180deg,
+          #fff8fb 0%,
+          #fffdf9 100%
+        );
+
+      color: var(--text);
+
+      font-family:
+        "Segoe UI",
+        Arial,
+        Helvetica,
+        sans-serif;
+    }
+
+    /* ================================
+       MAIN
+    ================================= */
+
+    .page {
+      width: 100%;
+      max-width: 560px;
+      margin: auto;
+      padding: 18px 14px 30px;
+    }
+
+    /* ================================
+       HEADER
+    ================================= */
+
+    .header {
+      text-align: center;
+      padding: 10px 10px 18px;
+    }
+
+    .logo {
+      width: 68px;
+      height: 68px;
+
+      margin: 0 auto 12px;
+
+      border-radius: 22px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 31px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #f8b7d0,
+          #d96b9c
+        );
+
+      box-shadow:
+        0 12px 25px rgba(217, 107, 156, .25);
+    }
+
+    .header h1 {
+      margin: 0;
+
+      font-size: 25px;
+      font-weight: 800;
+
+      letter-spacing: -.3px;
+    }
+
+    .header p {
+      margin: 7px auto 0;
+
+      max-width: 390px;
+
+      color: var(--muted);
+
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    /* ================================
+       CARD
+    ================================= */
+
+    .card {
+      background: rgba(255, 255, 255, .92);
+
+      border: 1px solid rgba(240, 213, 225, .9);
+
+      border-radius: 25px;
+
+      padding: 18px;
+
+      margin-bottom: 15px;
+
+      box-shadow:
+        0 12px 35px rgba(150, 87, 112, .10);
+    }
+
+    /* ================================
+       CAMERA
+    ================================= */
+
+    .camera-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      margin-bottom: 12px;
+    }
+
+    .camera-icon {
+      width: 40px;
+      height: 40px;
+
+      border-radius: 13px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: var(--pink-soft);
+
+      font-size: 20px;
+    }
+
+    .camera-title strong {
+      font-size: 16px;
+    }
+
+    .camera-title span {
+      display: block;
+
+      margin-top: 2px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+    }
+
+    /* ================================
+       READER
+    ================================= */
+
+    #reader {
+      width: 100%;
+
+      overflow: hidden;
+
+      border-radius: 21px;
+
+      background: #211820;
+
+      border: 4px solid #f8d7e5;
+
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.08),
+        0 10px 25px rgba(60, 35, 48, .12);
+
+      min-height: 280px;
+    }
+
+    #reader video {
+      border-radius: 15px !important;
+    }
+
+    /* ================================
+       STATUS
+    ================================= */
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+
+      text-align: center;
+
+      margin-top: 12px;
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      min-height: 20px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+
+      border-radius: 50%;
+
+      background: #d8a2b8;
+    }
+
+    /* ================================
+       BUTTON
+    ================================= */
+
+    .btn {
+      width: 100%;
+
+      border: 0;
+
+      border-radius: 15px;
+
+      padding: 14px 16px;
+
+      margin-top: 9px;
+
+      font-size: 15px;
+
+      font-weight: 800;
+
+      cursor: pointer;
+
+      transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        opacity .15s ease;
+    }
+
+    .btn:active {
+      transform: scale(.98);
+    }
+
+    .btn:disabled {
+      opacity: .48;
+      cursor: not-allowed;
+    }
+
+    .primary {
+      color: white;
+
+      background:
+        linear-gradient(
+          135deg,
+          #e28bb2,
+          #c95f91
+        );
+
+      box-shadow:
+        0 9px 20px rgba(201, 95, 145, .22);
+    }
+
+    .secondary {
+      color: #6f4c5c;
+
+      background: #f8e9ef;
+
+      border: 1px solid #efd2df;
+    }
+
+    /* ================================
+       INFO
+    ================================= */
+
+    .info {
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+
+      background: #fff6e9;
+
+      color: #765c43;
+
+      border: 1px solid #f3dfc4;
+
+      border-radius: 16px;
+
+      padding: 13px;
+
+      margin-bottom: 14px;
+
+      font-size: 13px;
+
+      line-height: 1.5;
+    }
+
+    .info-icon {
+      flex: 0 0 auto;
+
+      width: 28px;
+      height: 28px;
+
+      border-radius: 10px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #ffe9c7;
+    }
+
+    /* ================================
+       SUCCESS
+    ================================= */
+
+    .success {
+      display: none;
+
+      background: #edf9f2;
+
+      color: #36785a;
+
+      border: 1px solid #ccebd9;
+
+      border-radius: 17px;
+
+      padding: 14px;
+
+      margin-bottom: 14px;
+
+      line-height: 1.5;
+    }
+
+    .success-title {
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .qr-result {
+      background: white;
+
+      border: 1px solid #d9eee1;
+
+      border-radius: 10px;
+
+      padding: 8px;
+
+      margin-top: 7px;
+
+      font-size: 12px;
+
+      word-break: break-all;
+    }
+
+    /* ================================
+       ERROR
+    ================================= */
+
+    .error {
+      display: none;
+
+      background: #fff0f2;
+
+      color: #a43e54;
+
+      border: 1px solid #f3ccd5;
+
+      border-radius: 17px;
+
+      padding: 14px;
+
+      margin-bottom: 14px;
+
+      font-size: 13px;
+
+      line-height: 1.5;
+    }
+
+    /* ================================
+       GUIDE
+    ================================= */
+
+    .guide {
+      padding: 4px 2px;
+    }
+
+    .guide-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+
+      margin-bottom: 13px;
+
+      font-weight: 800;
+
+      font-size: 16px;
+    }
+
+    .guide-item {
+      display: flex;
+
+      gap: 12px;
+
+      margin-bottom: 13px;
+    }
+
+    .guide-number {
+      flex: 0 0 auto;
+
+      width: 29px;
+      height: 29px;
+
+      border-radius: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: var(--pink-soft);
+
+      color: var(--pink-dark);
+
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .guide-text {
+      color: var(--muted);
+
+      font-size: 13px;
+
+      line-height: 1.5;
+    }
+
+    /* ================================
+       FOOTER
+    ================================= */
+
+    .footer {
+      text-align: center;
+
+      color: #aa8997;
+
+      font-size: 11px;
+
+      padding: 5px 0 0;
+    }
+
+    /* ================================
+       MOBILE
+    ================================= */
+
+    @media (max-width: 420px) {
+
+      .page {
+        padding: 13px 10px 25px;
+      }
+
+      .header {
+        padding-top: 7px;
+      }
+
+      .logo {
+        width: 62px;
+        height: 62px;
+      }
+
+      .header h1 {
+        font-size: 22px;
+      }
+
+      .card {
+        padding: 15px;
+        border-radius: 22px;
+      }
+
+      #reader {
+        min-height: 260px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="page">
+
+    <!-- ================================
+         HEADER
+    ================================= -->
+
+    <div class="header">
+
+      <div class="logo">
+        🌷
+      </div>
+
+      <h1>
+        Kamera Absensi
+      </h1>
+
+      <p>
+        Arahkan kamera ke QR Code siswa
+        untuk mencatat kehadiran secara otomatis.
+      </p>
+
+    </div>
+
+
+    <!-- ================================
+         CAMERA CARD
+    ================================= -->
+
+    <div class="card">
+
+      <div class="camera-title">
+
+        <div class="camera-icon">
+          📷
+        </div>
+
+        <div>
+          <strong>
+            Pemindai QR
+          </strong>
+
+          <span>
+            Gunakan kamera belakang perangkat
+          </span>
+        </div>
+
+      </div>
+
+
+      <!-- INFO -->
+
+      <div class="info">
+
+        <div class="info-icon">
+          💡
+        </div>
+
+        <div>
+          Pastikan Chrome sudah memberikan
+          <b>izin kamera</b>. Arahkan QR Code
+          ke dalam kotak pemindaian sampai
+          berhasil terbaca.
+        </div>
+
+      </div>
+
+
+      <!-- ERROR -->
+
+      <div
+        id="errorBox"
+        class="error">
+      </div>
+
+
+      <!-- SUCCESS -->
+
+      <div
+        id="successBox"
+        class="success">
+      </div>
+
+
+      <!-- CAMERA -->
+
+      <div id="reader"></div>
+
+
+      <!-- STATUS -->
+
+      <div
+        id="status"
+        class="status">
+
+        <span class="status-dot"></span>
+
+        <span>
+          Kamera belum dimulai.
+        </span>
+
+      </div>
+
+
+      <!-- BUTTON -->
+
+      <button
+        id="startButton"
+        class="btn primary"
+        onclick="startCamera()">
+
+        📷 Izinkan & Mulai Kamera
+
+      </button>
+
+
+      <button
+        id="stopButton"
+        class="btn secondary"
+        onclick="stopCamera()"
+        disabled>
+
+        ⏹ Hentikan Kamera
+
+      </button>
+
+    </div>
+
+
+    <!-- ================================
+         GUIDE
+    ================================= -->
+
+    <div class="card">
+
+      <div class="guide">
+
+        <div class="guide-title">
+          🌸 Cara menggunakan kamera
+        </div>
+
+
+        <div class="guide-item">
+
+          <div class="guide-number">
+            1
+          </div>
+
+          <div class="guide-text">
+            Tekan tombol
+            <b>Izinkan & Mulai Kamera</b>.
+          </div>
+
+        </div>
+
+
+        <div class="guide-item">
+
+          <div class="guide-number">
+            2
+          </div>
+
+          <div class="guide-text">
+            Jika muncul permintaan izin,
+            pilih <b>Allow / Izinkan</b>.
+          </div>
+
+        </div>
+
+
+        <div class="guide-item">
+
+          <div class="guide-number">
+            3
+          </div>
+
+          <div class="guide-text">
+            Arahkan kamera belakang
+            ke QR Code siswa.
+          </div>
+
+        </div>
+
+
+        <div class="guide-item">
+
+          <div class="guide-number">
+            4
+          </div>
+
+          <div class="guide-text">
+            Setelah QR terbaca, hasil scan
+            otomatis dikirim kembali ke
+            aplikasi absensi.
+          </div>
+
+        </div>
+
+
+        <div class="guide-item">
+
+          <div class="guide-number">
+            5
+          </div>
+
+          <div class="guide-text">
+            Jika izin kamera tidak muncul,
+            buka pengaturan situs Chrome
+            dan ubah <b>Camera</b> menjadi
+            <b>Allow / Izinkan</b>.
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="footer">
+      Sistem Absensi QR • Kamera Pemindai
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       JAVASCRIPT
+       FUNGSI SCANNER DIPERTAHANKAN
+  =========================================== -->
+
+  <script>
+
+    let scanner = null;
+
+    let running = false;
+
+    let alreadyScanned = false;
+
+
+    /* ==========================================
+       ERROR
+    =========================================== */
+
+    function showError(message) {
+
+      const box =
+        document.getElementById('errorBox');
+
+      box.textContent = message;
+
+      box.style.display = 'block';
+
+    }
+
+
+    function hideError() {
+
+      document
+        .getElementById('errorBox')
+        .style.display = 'none';
+
+    }
+
+
+    /* ==========================================
+       SUCCESS
+    =========================================== */
+
+    function showSuccess(message) {
+
+      const box =
+        document.getElementById('successBox');
+
+      box.innerHTML = message;
+
+      box.style.display = 'block';
+
+    }
+
+
+    /* ==========================================
+       STATUS
+    =========================================== */
+
+    function setStatus(message) {
+
+      const status =
+        document.getElementById('status');
+
+      status.innerHTML =
+        '<span class="status-dot"></span>' +
+        '<span>' +
+        escapeHtml(message) +
+        '</span>';
+
+    }
+
+
+    /* ==========================================
+       START CAMERA
+    =========================================== */
+
+    async function startCamera() {
+
+      hideError();
+
+      document
+        .getElementById('successBox')
+        .style.display = 'none';
+
+      alreadyScanned = false;
+
+
+      /*
+       * Pastikan browser menyediakan kamera.
+       */
+
+      if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+      ) {
+
+        showError(
+          'Browser tidak menyediakan akses kamera. Pastikan halaman dibuka menggunakan HTTPS dan gunakan Chrome versi terbaru.'
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        setStatus(
+          'Meminta izin kamera dari Chrome...'
+        );
+
+
+        /*
+         * Memicu permission kamera.
+         */
+
+        const stream =
+          await navigator.mediaDevices.getUserMedia({
+
+            video: {
+              facingMode: {
+                ideal: 'environment'
+              }
+            },
+
+            audio: false
+
+          });
+
+
+        /*
+         * Stream hanya dipakai
+         * untuk memastikan izin kamera.
+         */
+
+        stream
+          .getTracks()
+          .forEach(function(track) {
+            track.stop();
+          });
+
+
+        await startScanner();
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+
+        let message =
+          'Akses kamera gagal. ';
+
+
+        if (
+          error.name ===
+          'NotAllowedError'
+        ) {
+
+          message +=
+            'Izin kamera ditolak. Ubah Camera menjadi Allow/Izinkan pada pengaturan situs Chrome, lalu coba lagi.';
+
+        }
+
+        else if (
+          error.name ===
+          'NotFoundError'
+        ) {
+
+          message +=
+            'Kamera tidak ditemukan pada perangkat.';
+
+        }
+
+        else if (
+          error.name ===
+          'NotReadableError'
+        ) {
+
+          message +=
+            'Kamera sedang digunakan aplikasi lain. Tutup aplikasi lain yang menggunakan kamera lalu coba lagi.';
+
+        }
+
+        else if (
+          error.name ===
+          'SecurityError'
+        ) {
+
+          message +=
+            'Browser memblokir kamera karena alasan keamanan. Pastikan halaman menggunakan HTTPS.';
+
+        }
+
+        else {
+
+          message +=
+            error.message ||
+            'Periksa izin kamera Chrome.';
+
+        }
+
+
+        showError(message);
+
+        setStatus(
+          'Kamera belum aktif.'
+        );
+
+      }
+
+    }
+
+
+    /* ==========================================
+       START SCANNER
+    =========================================== */
+
+    async function startScanner() {
+
+      try {
+
+        if (running) {
+          return;
+        }
+
+
+        scanner =
+          new Html5Qrcode('reader');
+
+
+        const config = {
+
+          fps: 10,
+
+          qrbox: {
+            width: 250,
+            height: 250
+          },
+
+          aspectRatio: 1.0
+
+        };
+
+
+        setStatus(
+          'Kamera aktif. Arahkan ke QR Code siswa.'
+        );
+
+
+        await scanner.start(
+
+          {
+            facingMode: 'environment'
+          },
+
+          config,
+
+          onScanSuccess,
+
+          onScanFailure
+
+        );
+
+
+        running = true;
+
+
+        document
+          .getElementById('startButton')
+          .disabled = true;
+
+
+        document
+          .getElementById('stopButton')
+          .disabled = false;
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+
+        showError(
+          'Kamera berhasil mendapat izin tetapi pemindai QR gagal dimulai: ' +
+          error.message
+        );
+
+
+        setStatus(
+          'Pemindai QR gagal dimulai.'
+        );
+
+      }
+
+    }
+
+
+    /* ==========================================
+       SCAN FAILURE
+    =========================================== */
+
+    function onScanFailure(errorMessage) {
+
+      /*
+       * Sengaja kosong.
+       *
+       * Scanner tetap mencari QR.
+       */
+
+    }
+
+
+    /* ==========================================
+       SCAN SUCCESS
+    =========================================== */
+
+    async function onScanSuccess(decodedText) {
+
+      if (alreadyScanned) {
+        return;
+      }
+
+
+      alreadyScanned = true;
+
+
+      setStatus(
+        'QR berhasil dibaca.'
+      );
+
+
+      showSuccess(
+
+        '<div class="success-title">' +
+        '✓ QR BERHASIL TERBACA' +
+        '</div>' +
+
+        '<div>' +
+        'Kode siswa berhasil diperoleh.' +
+        '</div>' +
+
+        '<div class="qr-result">' +
+        escapeHtml(decodedText) +
+        '</div>' +
+
+        '<div style="margin-top:8px;">' +
+        'Mengirim hasil ke aplikasi absensi...' +
+        '</div>'
+
+      );
+
+
+      await stopCamera();
+
+
+      /*
+       * KIRIM HASIL KE APLIKASI APPS SCRIPT
+       *
+       * BAGIAN INI SENGAJA DIPERTAHANKAN.
+       */
+
+      if (
+        window.opener &&
+        !window.opener.closed
+      ) {
+
+        window.opener.postMessage(
+
+          {
+
+            type: 'ABSENSI_QR',
+
+            qr: decodedText
+
+          },
+
+          '*'
+
+        );
+
+
+        setStatus(
+          'Hasil scan sudah dikirim ke aplikasi absensi.'
+        );
+
+
+        /*
+         * Beri waktu agar message diterima
+         * sebelum halaman ditutup.
+         */
+
+        setTimeout(function() {
+
+          try {
+
+            window.close();
+
+          }
+
+          catch (e) {}
+
+        }, 900);
+
+      }
+
+      else {
+
+        showError(
+          'Halaman kamera tidak dibuka dari aplikasi absensi. Silakan kembali ke aplikasi utama dan tekan Buka Kamera QR.'
+        );
+
+      }
+
+    }
+
+
+    /* ==========================================
+       STOP CAMERA
+    =========================================== */
+
+    async function stopCamera() {
+
+      if (!scanner) {
+        return;
+      }
+
+
+      try {
+
+        if (running) {
+
+          await scanner.stop();
+
+        }
+
+
+        scanner.clear();
+
+      }
+
+      catch (error) {
+
+        console.warn(error);
+
+      }
+
+
+      scanner = null;
+
+      running = false;
+
+
+      document
+        .getElementById('startButton')
+        .disabled = false;
+
+
+      document
+        .getElementById('stopButton')
+        .disabled = true;
+
+
+      setStatus(
+        'Kamera dihentikan.'
+      );
+
+    }
+
+
+    /* ==========================================
+       ESCAPE HTML
+    =========================================== */
+
+    function escapeHtml(value) {
+
+      return String(
+        value == null
+          ? ''
+          : value
+      )
+
+        .replace(
+          /&/g,
+          '&amp;'
+        )
+
+        .replace(
+          /</g,
+          '&lt;'
+        )
+
+        .replace(
+          />/g,
+          '&gt;'
+        )
+
+        .replace(
+          /"/g,
+          '&quot;'
+        )
+
+        .replace(
+          /'/g,
+          '&#039;'
+        );
+
+    }
+
+
+    /* ==========================================
+       BEFORE UNLOAD
+    =========================================== */
+
+    window.addEventListener(
+      'beforeunload',
+      function() {
+
+        if (scanner) {
+
+          try {
+
+            scanner.stop();
+
+          }
+
+          catch (e) {}
+
+        }
+
+      }
+    );
+
+  </script>
+
+</body>
+
+</html>
